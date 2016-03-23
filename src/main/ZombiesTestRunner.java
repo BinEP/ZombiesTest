@@ -75,6 +75,26 @@ public class ZombiesTestRunner extends Game {
 	public void moves() {
 		// TODO Auto-generated method stub
 		
+		playerMove();
+		zombieMove();
+		
+		
+		reloading();
+		
+		supplyDrop();
+		
+		horrorOfShooting();
+		
+		spawnZombie();
+		
+		scoringStuff();
+		cursorX = MouseInfo.getPointerInfo().getLocation().x - 8;
+		cursorY = MouseInfo.getPointerInfo().getLocation().y - 31;
+		
+	}
+
+	public void playerMove() {
+		
 		if (upPressed) {
 			deltaY = -movementVar;
 		} else if (downPressed) {
@@ -107,6 +127,10 @@ public class ZombiesTestRunner extends Game {
 		if (!screen.contains(player)) {
 			player.x -= deltaX;
 		}
+	}
+
+	public void zombieMove() {
+		
 		for (Zombie z : zombies) {
 			if (z.touchingPlayer(player)) {
 				player.x -= deltaX;
@@ -114,13 +138,12 @@ public class ZombiesTestRunner extends Game {
 		}
 		
 		for (Zombie z : zombies) {
-			if (z.moveX(player, zombies, playerHealth))
+			if (z.move(player, zombies, playerHealth))
 				playerHealth -= 2;
 		}
-		for (Zombie z : zombies) {
-			if (z.moveY(player, zombies, playerHealth))
-				playerHealth -= 2;
-		}
+	}
+
+	public void reloading() {
 		
 		ticks++;
 		
@@ -142,6 +165,9 @@ public class ZombiesTestRunner extends Game {
 				reloading = false;
 			}
 		}
+	}
+
+	public void supplyDrop() {
 		
 		if (supplyDrop && player.intersects(supplyDropX, supplyDropY, 30, 30)) {
 				currentGun = guns[insideDrop - 1];
@@ -153,6 +179,9 @@ public class ZombiesTestRunner extends Game {
 				score = 0;
 				dropMessageStartPoints = points;
 		}
+	}
+
+	public void horrorOfShooting() {
 		
 		if (shooting) {
 			
@@ -286,27 +315,9 @@ public class ZombiesTestRunner extends Game {
 			}
 			
 		}
-		
-		if (ticks >= maxTicks) {
-			firstLoad++;
-			ticks = 0;
-			
-			random = (int) (Math.random() * 2);
-			randomSpeed = (3 + (int) (Math.random() * 3)) * 0.25;
-			if (random == 1)
-				zombies.add(new Zombie((int) (Math.random() * 700) + 20, -20, 20, randomSpeed, zombieLives));
-			else
-				zombies.add(new Zombie((int) (Math.random() * 700) + 20, 500, 20, randomSpeed, zombieLives));
-			spawnCount++;
-			if (maxTicks > 50 && spawnCount % 2 == 0) {
-				maxTicks--;
-			}
-			if (spawnCount == 100) {
-				zombieLives += 100;
-			} else if (spawnCount == 50) {
-				zombieLives += 100;
-			}
-		}
+	}
+
+	public void scoringStuff() {
 		
 		scoreCount++;
 		if (scoreCount % 25 == 0) {
@@ -334,9 +345,30 @@ public class ZombiesTestRunner extends Game {
 				insideDrop = (int) (Math.random() * 6);
 			}
 		}
-		cursorX = MouseInfo.getPointerInfo().getLocation().x - 8;
-		cursorY = MouseInfo.getPointerInfo().getLocation().y - 31;
+	}
+
+	public void spawnZombie() {
 		
+		if (ticks >= maxTicks) {
+			firstLoad++;
+			ticks = 0;
+			
+			random = (int) (Math.random() * 2);
+			randomSpeed = (3 + (int) (Math.random() * 3)) * 0.25;
+			if (random == 1)
+				zombies.add(new Zombie((int) (Math.random() * 700) + 20, -20, 20, randomSpeed, zombieLives));
+			else
+				zombies.add(new Zombie((int) (Math.random() * 700) + 20, 500, 20, randomSpeed, zombieLives));
+			spawnCount++;
+			if (maxTicks > 50 && spawnCount % 2 == 0) {
+				maxTicks--;
+			}
+			if (spawnCount == 100) {
+				zombieLives += 100;
+			} else if (spawnCount == 50) {
+				zombieLives += 100;
+			}
+		}
 	}
 	
 	@Override
@@ -397,10 +429,23 @@ public class ZombiesTestRunner extends Game {
 		g.setFont(new Font("Century Gothic", Font.PLAIN, 12));
 		g.drawString(currentGun.name, 720, 475);
 		
+		drawHealth(g);
+		
+		
+		drawPlayer(g);
+		
+		
+	}
+
+	public void drawHealth(Graphics2D g) {
+		
 		g.setColor(Color.RED);
 		g.fillRect(400 - maxPlayerHealth / 2, 20, 200, 20);
 		g.setColor(Color.GREEN);
 		g.fillRect(400 - maxPlayerHealth / 2, 20, playerHealth, 20);
+	}
+
+	public void drawPlayer(Graphics2D g) {
 		
 		g.setColor(Color.CYAN);
 		int centerX = player.x + 15;
@@ -411,21 +456,6 @@ public class ZombiesTestRunner extends Game {
 		int a = centerX + (int) ((sideX * Math.sqrt(900)) / distance);
 		int b = centerY + (int) ((sideY * Math.sqrt(900)) / distance);
 		g.fillOval(a, b, 4, 4);
-		// if(currentGun.bullets < 30 || currentGun.magCurrent <
-		// currentGun.magSize){
-		// g.drawLine((int)currentGun.spreadOneLine.getX1(),
-		// (int)currentGun.spreadOneLine.getY1(),
-		// (int)currentGun.spreadOneLine.getX2(),
-		// (int)currentGun.spreadOneLine.getY2());
-		// g.drawLine((int)currentGun.spreadTwoLine.getX1(),
-		// (int)currentGun.spreadTwoLine.getY1(),
-		// (int)currentGun.spreadTwoLine.getX2(),
-		// (int)currentGun.spreadTwoLine.getY2());
-		// g.drawLine((int)currentGun.shot.getX1(),
-		// (int)currentGun.shot.getY1(), (int)currentGun.shot.getX2(),
-		// (int)currentGun.shot.getY2());
-		// }
-		
 	}
 	
 	@Override

@@ -79,6 +79,12 @@ public class Zombie extends Ellipse2D.Double {
 		return loseHealth;
 	}
 	
+	public boolean move(Rectangle player, ArrayList<Zombie> zombies, int playerHealth) {
+		return moveX(player, zombies, playerHealth) ||
+		moveY(player, zombies, playerHealth);
+
+	}
+	
 	public boolean moveY(Rectangle player, ArrayList<Zombie> zombies, int playerHealth){
 		
 		boolean loseHealth = false;
