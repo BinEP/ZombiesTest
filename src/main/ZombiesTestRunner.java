@@ -394,8 +394,38 @@ public class ZombiesTestRunner extends Game {
 	public void drawPlaying(Graphics2D g) {
 		
 		// TODO Auto-generated method stub
-		g.setColor(Color.BLACK);
-		g.fill(screen);
+		
+		supplyDropDraw(g);
+		
+		drawPlayer(g);
+		
+		drawZombies(g);
+		
+		drawAmmo(g);
+		
+		drawHealth(g);
+		
+		
+		drawAimDot(g);
+		
+		
+	}
+
+	public void drawZombies(Graphics2D g) {
+		
+		for (Zombie z : zombies) {
+			g.setColor(z.color);
+			g.fill(z);
+		}
+	}
+
+	public void drawPlayer(Graphics2D g) {
+		
+		g.setColor(Color.RED);
+		g.fillOval(player.x, player.y, playerWidth, playerWidth);
+	}
+
+	public void supplyDropDraw(Graphics2D g) {
 		
 		if (supplyDrop) {
 			g.setColor(Color.YELLOW);
@@ -408,14 +438,9 @@ public class ZombiesTestRunner extends Game {
 			g.setFont(new Font("Century Gothic", Font.PLAIN, 36));
 			g.drawString(dropMessage, supplyDropX, supplyDropY);
 		}
-		
-		g.setColor(Color.RED);
-		g.fillOval(player.x, player.y, playerWidth, playerWidth);
-		
-		for (Zombie z : zombies) {
-			g.setColor(z.color);
-			g.fill(z);
-		}
+	}
+
+	public void drawAmmo(Graphics2D g) {
 		
 		g.setFont(new Font("Century Gothic", Font.PLAIN, 64));
 		g.setColor(Color.orange);
@@ -423,18 +448,13 @@ public class ZombiesTestRunner extends Game {
 			g.drawString("-", 720, 460);
 		else
 			g.drawString(String.valueOf(currentGun.magCurrent), 720, 460);
+		
 		g.setFont(new Font("Century Gothic", Font.PLAIN, 28));
 		g.drawString(String.valueOf(currentGun.bullets), 760, 460);
 		g.drawString("Score: " + String.valueOf(points), 20, 460);
+		
 		g.setFont(new Font("Century Gothic", Font.PLAIN, 12));
 		g.drawString(currentGun.name, 720, 475);
-		
-		drawHealth(g);
-		
-		
-		drawPlayer(g);
-		
-		
 	}
 
 	public void drawHealth(Graphics2D g) {
@@ -445,7 +465,7 @@ public class ZombiesTestRunner extends Game {
 		g.fillRect(400 - maxPlayerHealth / 2, 20, playerHealth, 20);
 	}
 
-	public void drawPlayer(Graphics2D g) {
+	public void drawAimDot(Graphics2D g) {
 		
 		g.setColor(Color.CYAN);
 		int centerX = player.x + 15;
@@ -479,13 +499,6 @@ public class ZombiesTestRunner extends Game {
 		
 		// TODO Auto-generated method stub
 		return "Zombies";
-	}
-	
-	@Override
-	public void toPlayingBooleans() {
-		
-		super.toPlayingBooleans();
-		setBackgroundColor(Color.white);
 	}
 	
 	@Override
