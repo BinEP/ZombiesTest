@@ -15,18 +15,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javafx.scene.shape.Line;
+import persons.Player;
 import persons.Zombie;
 import utility_classes.Windows;
 import game_actions.Game;
 import game_actions.Runner;
-import guns.Gun;
+import guns.*;
 
 public class ZombiesTestRunner extends Game {
 	
 	public int playerX = 400;
 	public int playerY = 220;
 	public int playerWidth = 30;
-	public Rectangle player = new Rectangle(400 - 15, 220 - 15, playerWidth, playerWidth);
+	public Player player = new Player(playerX - 15, playerY - 15, playerWidth, playerWidth, 200);
 	public boolean touchingZombie = false;
 	
 	public int[] screenX = { 0, 800, 800, 0 };
@@ -36,40 +37,28 @@ public class ZombiesTestRunner extends Game {
 	public int maxTicks = 150;
 	public int scoreCount = 0;
 	public int spawnCount = 0;
-	public int score = 0;
 	public int roundCount = 1;
 	public int points = 0;
 	
-	public int cursorX;
-	public int cursorY;
-	
 	public boolean rPressed = false;
 	public boolean wPressed = false;
-	public long lastShot;
 	public boolean shooting = false;
-	public HashMap<String, Gun> guns = new HashMap<String, Gun>();
-	public Gun currentGun = guns.get("Pistol");
-	public int firstLoad = 0;
-	public long reloadStart;
-	public boolean reloading = false;
-	public long lastReload;
-	public boolean autoReady = true;
+	public static HashMap<String, Gun> guns = new HashMap<String, Gun>();
+	public Gun currentGun;
 	
-	public int random;
 	public double randomSpeed;
 	public ArrayList<Zombie> zombies = new ArrayList<Zombie>();
 	public int zombieLives = 100;
+		
+	public SupplyDrop supplyDrop = new SupplyDrop();
 	
-	public int playerHealth = 200;
-	public int maxPlayerHealth = 200;
+	public static int getMouseX() {
+		return MouseInfo.getPointerInfo().getLocation().x - 8;
+	}
 	
-	public boolean supplyDrop = false;
-	public int supplyDropX;
-	public int supplyDropY;
-	public int insideDrop;
-	public int dropMessageStartPoints = -2;
-	public int dropMessageDurationPoints = 2;
-	public String dropMessage;
+	public static int getMouseY() {
+		return MouseInfo.getPointerInfo().getLocation().y - 31;
+	}
 	
 	@Override
 	public void moves() {
@@ -79,7 +68,7 @@ public class ZombiesTestRunner extends Game {
 		zombieMove();
 		
 		
-		reloading();
+//		reloading();
 		
 		supplyDrop();
 		
@@ -88,12 +77,14 @@ public class ZombiesTestRunner extends Game {
 		spawnZombie();
 		
 		scoringStuff();
-		cursorX = MouseInfo.getPointerInfo().getLocation().x - 8;
-		cursorY = MouseInfo.getPointerInfo().getLocation().y - 31;
+		
 		
 	}
 
 	public void playerMove() {
+		//TODO Something is seriouosly messed up with movement, not sure what though.
+		//But I don't like how it looks - seems like zombie and player movements are mixed
+		//right now
 		
 		if (upPressed) {
 			deltaY = -movementVar;
@@ -105,13 +96,8 @@ public class ZombiesTestRunner extends Game {
 		
 		player.y += deltaY;
 		
-		if (!screen.contains(player)) {
+		if (!screen.contains(player.getBounds2D())) {
 			player.y -= deltaY;
-		}
-		for (Zombie z : zombies) {
-			if (z.touchingPlayer(player)) {
-				player.y -= deltaY;
-			}
 		}
 		
 		if (rightPressed) {
@@ -124,60 +110,36 @@ public class ZombiesTestRunner extends Game {
 		
 		player.x += deltaX;
 		
-		if (!screen.contains(player)) {
+		if (!screen.contains(player.getBounds2D())) {
 			player.x -= deltaX;
+		}
+		
+		for (Zombie z : zombies) {
+			if (z.touchingFigure(player)) {
+				player.x -= deltaX;
+				player.y -= deltaY;
+
+			}
 		}
 	}
 
 	public void zombieMove() {
 		
-		for (Zombie z : zombies) {
-			if (z.touchingPlayer(player)) {
-				player.x -= deltaX;
-			}
-		}
+		//TODO Something is seriouosly messed up with movement, not sure what though.
+		//But I don't like how it looks - seems like zombie and player movements are mixed
+		//right now
 		
 		for (Zombie z : zombies) {
-			if (z.move(player, zombies, playerHealth))
-				playerHealth -= 2;
-		}
-	}
-
-	public void reloading() {
-		
-		ticks++;
-		
-		if (firstLoad == 1) {
-			currentGun.reload();
-			firstLoad++;
-			reloading = false;
-		} else if (firstLoad > 1) {
-			if (rPressed && currentGun.magCurrent < currentGun.magSize && currentGun.bullets > 0) {
-				rPressed = false;
-				reloadStart = System.currentTimeMillis();
-				reloading = true;
-			} else if (currentGun.magCurrent == 0 && currentGun.bullets > 0 && !reloading) {
-				reloadStart = System.currentTimeMillis();
-				reloading = true;
-			}
-			if (System.currentTimeMillis() - reloadStart > currentGun.reloadTime && reloading) {
-				currentGun.reload();
-				reloading = false;
-			}
+			if (z.move(player, zombies, player.health))
+				player.health -= 2;
 		}
 	}
 
 	public void supplyDrop() {
 		
-		if (supplyDrop && player.intersects(supplyDropX, supplyDropY, 30, 30)) {
-				currentGun = guns[insideDrop - 1];
-				currentGun.bullets = currentGun.maxBullets;
-				dropMessage = currentGun.name;
-				rPressed = (insideDrop != 0);
-				
-				supplyDrop = false;
-				score = 0;
-				dropMessageStartPoints = points;
+		if (supplyDrop.intersects(player.getBounds2D())) {
+			score = 0;
+			supplyDrop.applyDrop(currentGun);
 		}
 	}
 
@@ -188,10 +150,10 @@ public class ZombiesTestRunner extends Game {
 			if (!currentGun.isAuto || autoReady) {
 				autoReady = false;
 				for (Zombie z : zombies) {
-					z.shot(z, currentGun.shot, "Normal");
+					z.shot(currentGun.shot, "Normal");
 					if (currentGun.name == "Shotgun") {
-						z.shot(z, currentGun.spreadOneLine, "Spread One");
-						z.shot(z, currentGun.spreadTwoLine, "Spread Two");
+						z.shot(currentGun.spreadOneLine, "Spread One");
+						z.shot(currentGun.spreadTwoLine, "Spread Two");
 					}
 				}
 				double[] minDistance = { 2000, -1 }; // Minimum distance from
@@ -202,7 +164,7 @@ public class ZombiesTestRunner extends Game {
 					for (Zombie z : zombies) {
 						if (z.isShot) {
 							score++;
-							if ((z.lives -= currentGun.damage) < 0) {
+							if ((z.health -= currentGun.damage) < 0) {
 								zombies.remove(i);
 								score++;
 							} else
@@ -227,7 +189,7 @@ public class ZombiesTestRunner extends Game {
 					if (minDistance[0] != 2000) {
 						// zombies.get((int)minDistance[1]).isShot = true;
 						score++;
-						if ((zombies.get((int) minDistance[1]).lives -= currentGun.damage) < 0) {
+						if ((zombies.get((int) minDistance[1]).health -= currentGun.damage) < 0) {
 							zombies.remove((int) minDistance[1]);
 							score++;
 						} else
@@ -256,7 +218,7 @@ public class ZombiesTestRunner extends Game {
 						if (minDistance1[0] != 2000) {
 							// zombies.get((int)minDistance[1]).isShot = true;
 							score++;
-							if ((zombies.get((int) minDistance1[1]).lives -= currentGun.damage) < 0) {
+							if ((zombies.get((int) minDistance1[1]).health -= currentGun.damage) < 0) {
 								zombies.remove((int) minDistance1[1]);
 								score++;
 							} else
@@ -283,7 +245,7 @@ public class ZombiesTestRunner extends Game {
 						if (minDistance2[0] != 2000) {
 							// zombies.get((int)minDistance[1]).isShot = true;
 							score++;
-							if ((zombies.get((int) minDistance2[1]).lives -= currentGun.damage) < 0) {
+							if ((zombies.get((int) minDistance2[1]).health -= currentGun.damage) < 0) {
 								zombies.remove((int) minDistance2[1]);
 								score++;
 							} else
@@ -297,7 +259,7 @@ public class ZombiesTestRunner extends Game {
 				if (currentGun.magCurrent > 0 && System.currentTimeMillis() - lastShot > currentGun.shotTime
 						&& !reloading) {
 					shooting = true;
-					currentGun.shoot(player, cursorX, cursorY);
+					currentGun.shoot(player);
 					lastShot = System.currentTimeMillis();
 					autoReady = true;
 				}
@@ -321,9 +283,9 @@ public class ZombiesTestRunner extends Game {
 		
 		scoreCount++;
 		if (scoreCount % 25 == 0) {
-			if (playerHealth < maxPlayerHealth)
-				playerHealth++;
+			player.boostHealth();
 		}
+		
 		if (scoreCount == 150) {
 			scoreCount = 0;
 			score++;
@@ -332,42 +294,26 @@ public class ZombiesTestRunner extends Game {
 		if (score >= 100) {
 			score = 0;
 			roundCount += 1;
-			if (!supplyDrop) {
-				supplyDrop = true;
-				supplyDropX = (int) (Math.random() * 650) + 20;
-				supplyDropY = (int) (Math.random() * 350) + 70;
-				while (supplyDropX > player.x - 40 && supplyDropX < player.x + 40) {
-					supplyDropX = (int) (Math.random() * 760) + 20;
-				}
-				while (supplyDropY > player.y - 40 && supplyDropY < player.y + 40) {
-					supplyDropY = (int) (Math.random() * 400) + 20;
-				}
-				insideDrop = (int) (Math.random() * 6);
-			}
+			supplyDrop.spawnSupplyDrop(player);
 		}
 	}
 
 	public void spawnZombie() {
 		
 		if (ticks >= maxTicks) {
-			firstLoad++;
 			ticks = 0;
 			
-			random = (int) (Math.random() * 2);
 			randomSpeed = (3 + (int) (Math.random() * 3)) * 0.25;
-			if (random == 1)
-				zombies.add(new Zombie((int) (Math.random() * 700) + 20, -20, 20, randomSpeed, zombieLives));
-			else
-				zombies.add(new Zombie((int) (Math.random() * 700) + 20, 500, 20, randomSpeed, zombieLives));
+			int zombieY = ((int) (Math.random() * 2) == 1) ? -20 : 500;
+			
+			zombies.add(new Zombie((int) (Math.random() * 700) + 20, zombieY, 20, randomSpeed, zombieLives));
 			spawnCount++;
 			if (maxTicks > 50 && spawnCount % 2 == 0) {
 				maxTicks--;
 			}
-			if (spawnCount == 100) {
+			if (spawnCount == 100 || spawnCount == 50)
 				zombieLives += 100;
-			} else if (spawnCount == 50) {
-				zombieLives += 100;
-			}
+			
 		}
 	}
 	
@@ -375,7 +321,7 @@ public class ZombiesTestRunner extends Game {
 	public boolean checkIfDead() {
 		// TODO Auto-generated method stub
 		
-		return playerHealth <= 0;
+		return player.health <= 0;
 	}
 	
 	@Override
@@ -427,27 +373,15 @@ public class ZombiesTestRunner extends Game {
 
 	public void supplyDropDraw(Graphics2D g) {
 		
-		if (supplyDrop) {
-			g.setColor(Color.YELLOW);
-			g.fillRect(supplyDropX, supplyDropY, 30, 30);
-			
-		}
-		
-		if (points - dropMessageStartPoints < dropMessageDurationPoints) {
-			g.setColor(Color.ORANGE);
-			g.setFont(new Font("Century Gothic", Font.PLAIN, 36));
-			g.drawString(dropMessage, supplyDropX, supplyDropY);
-		}
+		supplyDrop.draw(g);
 	}
 
 	public void drawAmmo(Graphics2D g) {
 		
 		g.setFont(new Font("Century Gothic", Font.PLAIN, 64));
 		g.setColor(Color.orange);
-		if (reloading)
-			g.drawString("-", 720, 460);
-		else
-			g.drawString(String.valueOf(currentGun.magCurrent), 720, 460);
+		g.drawString((currentGun.isReloading()) ? "-" : "" + currentGun.magCurrent, 720, 460);
+		
 		
 		g.setFont(new Font("Century Gothic", Font.PLAIN, 28));
 		g.drawString(String.valueOf(currentGun.bullets), 760, 460);
@@ -460,9 +394,9 @@ public class ZombiesTestRunner extends Game {
 	public void drawHealth(Graphics2D g) {
 		
 		g.setColor(Color.RED);
-		g.fillRect(400 - maxPlayerHealth / 2, 20, 200, 20);
+		g.fillRect(400 - player.maxHealth / 2, 20, 200, 20);
 		g.setColor(Color.GREEN);
-		g.fillRect(400 - maxPlayerHealth / 2, 20, playerHealth, 20);
+		g.fillRect(400 - player.maxHealth / 2, 20, player.health, 20);
 	}
 
 	public void drawAimDot(Graphics2D g) {
@@ -470,8 +404,8 @@ public class ZombiesTestRunner extends Game {
 		g.setColor(Color.CYAN);
 		int centerX = player.x + 15;
 		int centerY = player.y + 15;
-		int sideX = cursorX - centerX;
-		int sideY = cursorY - centerY;
+		int sideX = getMouseX() - centerX;
+		int sideY = getMouseY() - centerY;
 		double distance = Math.sqrt(sideX * sideX + sideY * sideY);
 		int a = centerX + (int) ((sideX * Math.sqrt(900)) / distance);
 		int b = centerY + (int) ((sideY * Math.sqrt(900)) / distance);
@@ -482,16 +416,24 @@ public class ZombiesTestRunner extends Game {
 	public void setup() {
 		// TODO Auto-generated method stub
 		
+		guns.put("Pistol", new Pistol());
+		guns.put("AK-47", new Automatic());
+		guns.put("Rifle", new Rifle());
+		guns.put("Shotgun", new Shotgun());
+		guns.put("Sniper", new Sniper());
+
+		currentGun = guns.get("Pistol");
+
 		upKey = KeyEvent.VK_R;
 		downKey = KeyEvent.VK_S;
 		leftKey = KeyEvent.VK_A;
 		rightKey = KeyEvent.VK_D;
 		
 		movementVar = 3;
-		reloading = true;
-		lastShot = System.currentTimeMillis();
 		shooting = false;
 		Windows.setSCORE_SIZE(30);
+		currentGun.reload();
+		
 	}
 	
 	@Override
@@ -505,13 +447,14 @@ public class ZombiesTestRunner extends Game {
 	public void pressed(MouseEvent m) {
 		
 		if (m.getButton() == MouseEvent.BUTTON1) {
-			if (System.currentTimeMillis() - lastShot > currentGun.shotTime && !reloading
-					&& currentGun.magCurrent > 0) {
+//			if (System.currentTimeMillis() - lastShot > currentGun.shotTime && !reloading
+//					&& currentGun.magCurrent > 0) {
 				shooting = true;
-				currentGun.shoot(player, cursorX, cursorY);
-				lastShot = System.currentTimeMillis();
-				autoReady = true;
-			}
+//				currentGun.shoot(player, cursorX, cursorY);
+//				lastShot = System.currentTimeMillis();
+//				autoReady = true;
+//			}
+			currentGun.shootEvent(player);
 		}
 	}
 	
@@ -520,6 +463,7 @@ public class ZombiesTestRunner extends Game {
 		
 		if (m.getButton() == MouseEvent.BUTTON1) {
 			shooting = false;
+			currentGun.stopShooting();
 		}
 	}
 	
@@ -528,6 +472,7 @@ public class ZombiesTestRunner extends Game {
 		
 		if (e.getKeyCode() == KeyEvent.VK_R) {
 			rPressed = true;
+			currentGun.reloadEvent();
 		}
 	}
 	
