@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javafx.scene.shape.Line;
 import persons.Player;
@@ -70,10 +71,13 @@ public class ZombiesTestRunner extends Game {
 		
 //		reloading();
 		
-		supplyDrop();
 		
 		horrorOfShooting();
+		score += currentGun.score;
+		currentGun.score = 0;
 		
+		supplyDrop();
+
 		spawnZombie();
 		
 		scoringStuff();
@@ -87,40 +91,25 @@ public class ZombiesTestRunner extends Game {
 		//right now
 		
 		if (upPressed) {
-			deltaY = -movementVar;
+			player.deltaY = -movementVar;
 		} else if (downPressed) {
-			deltaY = movementVar;
+			player.deltaY = movementVar;
 		} else {
-			deltaY = 0;
+			player.deltaY = 0;
 		}
 		
-		player.y += deltaY;
 		
-		if (!screen.contains(player.getBounds2D())) {
-			player.y -= deltaY;
-		}
 		
 		if (rightPressed) {
-			deltaX = movementVar;
+			player.deltaX = movementVar;
 		} else if (leftPressed) {
-			deltaX = -movementVar;
+			player.deltaX = -movementVar;
 		} else {
-			deltaX = 0;
+			player.deltaX = 0;
 		}
 		
-		player.x += deltaX;
+		player.move(screen, zombies, player);
 		
-		if (!screen.contains(player.getBounds2D())) {
-			player.x -= deltaX;
-		}
-		
-		for (Zombie z : zombies) {
-			if (z.touchingFigure(player)) {
-				player.x -= deltaX;
-				player.y -= deltaY;
-
-			}
-		}
 	}
 
 	public void zombieMove() {
@@ -130,8 +119,9 @@ public class ZombiesTestRunner extends Game {
 		//right now
 		
 		for (Zombie z : zombies) {
-			if (z.move(player, zombies, player.health))
-				player.health -= 2;
+//			if (z.move(player, zombies, player.health))
+//				player.health -= 2;
+			z.move(screen, zombies, player);
 		}
 	}
 
@@ -416,14 +406,14 @@ public class ZombiesTestRunner extends Game {
 	public void setup() {
 		// TODO Auto-generated method stub
 		
-		guns.put("Pistol", new Pistol());
-		guns.put("AK-47", new Automatic());
-		guns.put("Rifle", new Rifle());
-		guns.put("Shotgun", new Shotgun());
-		guns.put("Sniper", new Sniper());
+		guns.put("Pistol", new Pistol(zombies, player));
+		guns.put("AK-47", new Automatic(zombies, player));
+		guns.put("Rifle", new Rifle(zombies, player));
+		guns.put("Shotgun", new Shotgun(zombies, player));
+		guns.put("Sniper", new Sniper(zombies, player));
 
 		currentGun = guns.get("Pistol");
-
+		
 		upKey = KeyEvent.VK_R;
 		downKey = KeyEvent.VK_S;
 		leftKey = KeyEvent.VK_A;

@@ -9,12 +9,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Line2D.Double;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 import javafx.scene.shape.Line;
 import main.SpecialTimer;
 import main.ZombiesTestRunner;
 import persons.Figure;
 import persons.Player;
+import persons.Zombie;
 
 public abstract class Gun implements ActionListener{
 	
@@ -25,21 +27,21 @@ public abstract class Gun implements ActionListener{
 	public int reloadTime;
 	public int shotTime;
 	public SpecialTimer firingTimer;
-	public Line2D.Double shot = new Line2D.Double();
+	public Shot shot = new Shot();
 	
 	public String name;
 	public int damage;
-	public boolean isAuto;
 	
 	public Player player;
+	public ArrayList<Zombie> zombies;
+	public int score = 0;
 	
-	public Gun(String name, int bullets, int magSize, boolean isAuto, int reloadTime, int shotTime, int damage) {
+	public Gun(String name, int bullets, int magSize, int reloadTime, int shotTime, int damage) {
 		this.damage = damage;
 		this.name = name;
 		this.bullets = bullets;
 		this.maxBullets = bullets;
 		this.magCurrent = 0;
-		this.isAuto = isAuto;
 		this.magSize = magSize;
 		this.reloadTime = reloadTime;
 		this.shotTime = shotTime;
@@ -51,6 +53,10 @@ public abstract class Gun implements ActionListener{
 	
 	public void setPlayer(Player p) {
 		this.player = p;
+	}
+	
+	public void setZombies(ArrayList<Zombie> zombies) {
+		this.zombies = zombies;
 	}
 	
 	
@@ -70,30 +76,55 @@ public abstract class Gun implements ActionListener{
 		}
 	}
 	
-	public void shoot(Figure player) {
+	public ArrayList<Integer> shoot(Figure player) {
 		
 		if (magCurrent <= 0) {
 			reloadEvent();
-			return;
+			return new ArrayList<Integer>();
 		}
-		int mouseX = MouseInfo.getPointerInfo().getLocation().x - 8;
-		int mouseY = MouseInfo.getPointerInfo().getLocation().y - 31;
 		
 		int rise = ZombiesTestRunner.getMouseY() - player.y;
 		int run = ZombiesTestRunner.getMouseX() - player.x;
 		
-			magCurrent--;
-			while ((run + player.x > 0 && run + player.x < 800) && (rise + player.y > 0 && rise + player.y < 480)) {
-				run *= 2;
-				rise *= 2;
-			}
-			int x = player.x + run;
-			int y = player.y + rise;
-			shot = new Line2D.Double(player.x + 15, player.y + 15, x, y);
-			
+		magCurrent--;
+		while ((run + player.x > 0 && run + player.x < 800) && (rise + player.y > 0 && rise + player.y < 480)) {
+			run *= 2;
+			rise *= 2;
+		}
+		int x = player.x + run;
+		int y = player.y + rise;
+		shot = new Shot(player.x + 15, player.y + 15, x, y);
 		
+		modifyShot();
+		
+		ArrayList<Integer> shotZombies = new ArrayList<Integer>();
+		for (int i = 0; i < zombies.size(); i++) {
+			if (applyShot(zombies.get(i))) {
+				shotZombies.add(i);
+			}
+		}
+		return shotZombies;
 	}
 	
+	public void resetShot() {
+		shot.unshoot();
+	}
+	
+	public boolean applyShot(Zombie zombie) {
+		return checkShot(zombie, shot);
+	}
+	
+	protected boolean checkShot(Zombie zombie, Shot shot) {
+		if (zombie.ifShot(shot) && !shot.isShot()) {
+			shot.shotHit();
+			zombie.health -= damage;
+			score++;
+			return true;
+		}
+		return false;
+	}
+	public abstract void modifyShot();
+
 	
 	public void maxAmmo() {
 		bullets = maxBullets;
@@ -126,6 +157,7 @@ public abstract class Gun implements ActionListener{
 			firingTimer.setInitialDelay(getGunDelay());
 			firingTimer.fireTimerWhenStart(true);
 			firingTimer.setActionCommand("Shoot");
+			resetShot();
 			firingTimer.restart();
 		}
 	}

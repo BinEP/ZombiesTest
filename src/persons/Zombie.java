@@ -1,5 +1,6 @@
 package persons;
 import java.awt.Color;
+import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -16,10 +17,6 @@ public class Zombie extends Figure {
 	
 	public boolean isUndead = false;
 	
-	public boolean spreadOneHit = false;
-	public boolean spreadTwoHit = false;
-	
-	
 	public final Color FOREST = new Color(34, 139, 34);
 	public final Color OLIVE = new Color(107, 142, 35);
 	public final Color LIGHT_GREEN = new Color(144, 238, 144);
@@ -31,6 +28,7 @@ public class Zombie extends Figure {
 //		width = c; 
 		
 		this.setColor();
+		ifLoseHealth = false;
 	}
 	
 	public void setColor(){
@@ -50,25 +48,11 @@ public class Zombie extends Figure {
 		}
 	}
 	
-	
-	
-	public void shot(Line2D.Double shot, String shotType){
+	public boolean ifShot(Line2D.Double shot){
 		
-		Rectangle zombieRect = new Rectangle((int) x, (int) y, (int) width, (int) width);
-		
-		if(shotType == "Normal"){
-			if(zombieRect.intersectsLine(shot.getX1(), shot.getY1(), shot.getX2(), shot.getY2())){
-				isShot = true;
-			}
-		} else if(shotType == "Spread One"){
-			if(zombieRect.intersectsLine(shot.getX1(), shot.getY1(), shot.getX2(), shot.getY2())){
-				spreadOneHit = true;
-			}
-		} else{
-			if(zombieRect.intersectsLine(shot.getX1(), shot.getY1(), shot.getX2(), shot.getY2())){
-				spreadTwoHit = true;
-			}
-		}
+		Rectangle zombieRect = this.getBounds();
+		return zombieRect.intersectsLine(shot.getX1(), shot.getY1(), shot.getX2(), shot.getY2());
+				
 	}
 	
 	public double getDistanceToPlayer(Rectangle player){
@@ -83,5 +67,60 @@ public class Zombie extends Figure {
 		double distance = Math.sqrt(sideA * sideA + sideB * sideB);
 		
 		return distance;
+	}
+	
+	@Override
+	public void move(Polygon screen, ArrayList<? extends Figure> badFigures, Figure player) {
+		moveX(player);
+		moveY(player);
+		checkCollisions(badFigures, player);
+		// TODO Auto-generated method stub
+	}
+	
+	public void moveX(Figure player) {
+		
+		deltaX = 0;
+		if (player.x >= x) {
+			deltaX = movementVar;
+		} else if (player.x <= x) {
+			deltaX = -movementVar;
+		}
+		
+		x += deltaX;
+		
+	}
+	
+	public void moveY(Figure player) {
+		
+		deltaY = 0;
+		
+		if (player.y >= y) {
+			deltaY = movementVar;
+		} else if (player.y <= y) {
+			deltaY = -movementVar;
+		}
+		
+		y += deltaY;
+		
+	}
+	
+	public boolean checkCollisions(ArrayList<? extends Figure> badFigures, Figure player) {
+		super.checkCollisions(badFigures);
+		
+		if (touchingFigure(player)) {
+			x -= deltaX;
+			y -= deltaY;
+		}
+		return false;
+	}
+	
+	public boolean isDead() {
+		return health <= 0;
+	}
+
+	
+	public void gotShot(int damage) {
+		health -= damage;
+		this.setColor();
 	}
 }

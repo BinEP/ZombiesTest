@@ -4,35 +4,53 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
 
 import persons.Figure;
+import persons.Player;
+import persons.Zombie;
 
 public class Shotgun extends Gun {
 	
-	public Line2D.Double spreadOneLine = new Line2D.Double();
-	public Line2D.Double spreadTwoLine = new Line2D.Double();
+	public Shot spreadOneShot = new Shot();
+	public Shot spreadTwoShot = new Shot();
 	
-	public Shotgun() {
-		super("Shotgun", 54, 9, false, 2000, 150, 100);
+	public Shotgun(ArrayList<Zombie> zombies, Player player) {
+		super("Shotgun", 54, 9, 2000, 150, 100);
+		setPlayer(player);
+		setZombies(zombies);
 		
 	}
 	
 	@Override
-	public void shoot(Figure player) {
+	public void resetShot() {	
+		spreadOneShot.unshoot();
+		spreadTwoShot.unshoot();
+		super.resetShot();
+	}
+	
+	@Override
+	public boolean applyShot(Zombie zombie) {
 		
-		
-		// TODO Auto-generated method stub
-		super.shoot(player);
+		boolean zombieShot = false;
+		zombieShot = zombieShot || checkShot(zombie, shot);
+		zombieShot = zombieShot || checkShot(zombie, spreadOneShot);
+		zombieShot = zombieShot || checkShot(zombie, spreadTwoShot);
+
+		return zombieShot;
+	}
+
+	@Override
+	public void modifyShot() {
 		
 		if (magCurrent >= 0) {
 			AffineTransform af = new AffineTransform();
 			af.setToRotation(Math.PI / 20, player.x + 15, player.y + 15);
-			spreadOneLine.setLine(new Point(player.x + 15, player.y + 15), af.transform(shot.getP2(), null));
+			spreadOneShot.setLine(new Point(player.x + 15, player.y + 15), af.transform(shot.getP2(), null));
 			
 			af.setToRotation(-Math.PI / 20, player.x + 15, player.x + 15);
-			spreadTwoLine.setLine(new Point(player.x + 15, player.y + 15), af.transform(shot.getP2(), null));
-		}
-		
+			spreadTwoShot.setLine(new Point(player.x + 15, player.y + 15), af.transform(shot.getP2(), null));
+		}		
 	}
 	
 	
