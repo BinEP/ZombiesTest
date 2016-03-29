@@ -83,8 +83,8 @@ public abstract class Gun implements ActionListener{
 			return new ArrayList<Integer>();
 		}
 		
-		int rise = ZombiesTestRunner.getMouseY() - player.y;
-		int run = ZombiesTestRunner.getMouseX() - player.x;
+		int rise = ZombiesTestRunner.getMouseY() - player.y - player.width;
+		int run = ZombiesTestRunner.getMouseX() - player.x - player.width;
 		
 		magCurrent--;
 		while ((run + player.x > 0 && run + player.x < 800) && (rise + player.y > 0 && rise + player.y < 480)) {
@@ -93,14 +93,36 @@ public abstract class Gun implements ActionListener{
 		}
 		int x = player.x + run;
 		int y = player.y + rise;
-		shot = new Shot(player.x + 15, player.y + 15, x, y);
+		shot = new Shot(player.x + player.width, player.y + player.width, x, y);
 		
 		modifyShot();
+		
+		ArrayList<Integer> shotZombies = loopThroughZombies();
+		
+		updateZombieHealth(shotZombies);
+		return shotZombies;
+	}
+
+	public void updateZombieHealth(ArrayList<Integer> shotZombies) {
+		for (int i : shotZombies) {
+			Zombie z = zombies.get(i);
+			if (z.health <= 0) {
+				zombies.remove(i);
+				score++;
+			} else {
+				z.setColor();
+			}
+		}
+		
+	}
+
+	public ArrayList<Integer> loopThroughZombies() {
 		
 		ArrayList<Integer> shotZombies = new ArrayList<Integer>();
 		for (int i = 0; i < zombies.size(); i++) {
 			if (applyShot(zombies.get(i))) {
 				shotZombies.add(i);
+				return shotZombies;
 			}
 		}
 		return shotZombies;
@@ -122,7 +144,8 @@ public abstract class Gun implements ActionListener{
 			return true;
 		}
 		return false;
-	}
+	}	
+	
 	public abstract void modifyShot();
 
 	

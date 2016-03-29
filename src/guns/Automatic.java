@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import persons.Player;
 import persons.Zombie;
 
-public class Automatic extends Gun {
+public abstract class Automatic extends Gun {
 	
-	public Automatic(ArrayList<Zombie> zombies, Player player) {
-		super("AK-47", 160, 40, 1500, 200, 100);
+	public Automatic(ArrayList<Zombie> zombies, Player player, String name, int bullets, int magSize, int reloadTime, int shotTime, int damage) {
+		super(name, bullets, magSize, reloadTime, shotTime, damage);
 		setPlayer(player);
 		setZombies(zombies);
 	}

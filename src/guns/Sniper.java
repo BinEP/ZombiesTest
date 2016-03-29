@@ -12,6 +12,19 @@ public class Sniper extends Gun {
 		setPlayer(player);
 		setZombies(zombies);
 	}
+	
+	@Override
+	public ArrayList<Integer> loopThroughZombies() {
+		
+		ArrayList<Integer> shotZombies = new ArrayList<Integer>();
+		for (int i = 0; i < zombies.size(); i++) {
+			if (applyShot(zombies.get(i))) {
+				shotZombies.add(i);
+			}
+		}
+		return shotZombies;
+
+	}
 
 	@Override
 	public boolean applyShot(Zombie zombie) {

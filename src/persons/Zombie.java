@@ -69,6 +69,8 @@ public class Zombie extends Figure {
 		return distance;
 	}
 	
+	
+	
 	@Override
 	public void move(Polygon screen, ArrayList<? extends Figure> badFigures, Figure player) {
 		moveX(player);

@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -71,10 +72,11 @@ public class ZombiesTestRunner extends Game {
 		
 //		reloading();
 		
-		
-		horrorOfShooting();
+		Collections.sort(zombies, (z1, z2) -> (int) z1.getDistanceToPlayer(player.getBounds()) - (int) z2.getDistanceToPlayer(player.getBounds()));
 		score += currentGun.score;
 		currentGun.score = 0;
+		
+		
 		
 		supplyDrop();
 
@@ -130,142 +132,6 @@ public class ZombiesTestRunner extends Game {
 		if (supplyDrop.intersects(player.getBounds2D())) {
 			score = 0;
 			supplyDrop.applyDrop(currentGun);
-		}
-	}
-
-	public void horrorOfShooting() {
-		
-		if (shooting) {
-			
-			if (!currentGun.isAuto || autoReady) {
-				autoReady = false;
-				for (Zombie z : zombies) {
-					z.shot(currentGun.shot, "Normal");
-					if (currentGun.name == "Shotgun") {
-						z.shot(currentGun.spreadOneLine, "Spread One");
-						z.shot(currentGun.spreadTwoLine, "Spread Two");
-					}
-				}
-				double[] minDistance = { 2000, -1 }; // Minimum distance from
-														// zombie to player and
-														// index of zombie
-				int i = 0;
-				if (currentGun.name == "Sniper") {
-					for (Zombie z : zombies) {
-						if (z.isShot) {
-							score++;
-							if ((z.health -= currentGun.damage) < 0) {
-								zombies.remove(i);
-								score++;
-							} else
-								zombies.get(i).setColor();
-						}
-						i++;
-					}
-				} else {
-					i = 0;
-					
-					for (Zombie z : zombies) {
-						if (z.isShot) {
-							double temp = z.getDistanceToPlayer(player);
-							if (temp < minDistance[0]) {
-								minDistance[0] = temp;
-								minDistance[1] = i;
-							}
-							z.isShot = false;
-						}
-						i++;
-					}
-					if (minDistance[0] != 2000) {
-						// zombies.get((int)minDistance[1]).isShot = true;
-						score++;
-						if ((zombies.get((int) minDistance[1]).health -= currentGun.damage) < 0) {
-							zombies.remove((int) minDistance[1]);
-							score++;
-						} else
-							zombies.get((int) minDistance[1]).setColor();
-					}
-					
-					if (currentGun.name == "Shotgun") {
-						double[] minDistance1 = { 2000, -1 }; // Minimum
-																// distance from
-																// zombie to
-																// player and
-																// index of
-																// zombie
-						int j = 0;
-						for (Zombie z : zombies) {
-							if (z.spreadOneHit) {
-								double temp = z.getDistanceToPlayer(player);
-								if (temp < minDistance1[0]) {
-									minDistance1[0] = temp;
-									minDistance1[1] = j;
-								}
-								z.spreadOneHit = false;
-							}
-							j++;
-						}
-						if (minDistance1[0] != 2000) {
-							// zombies.get((int)minDistance[1]).isShot = true;
-							score++;
-							if ((zombies.get((int) minDistance1[1]).health -= currentGun.damage) < 0) {
-								zombies.remove((int) minDistance1[1]);
-								score++;
-							} else
-								zombies.get((int) minDistance1[1]).setColor();
-						}
-						double[] minDistance2 = { 2000, -1 }; // Minimum
-																// distance from
-																// zombie to
-																// player and
-																// index of
-																// zombie
-						int k = 0;
-						for (Zombie z : zombies) {
-							if (z.spreadOneHit) {
-								double temp = z.getDistanceToPlayer(player);
-								if (temp < minDistance2[0]) {
-									minDistance2[0] = temp;
-									minDistance2[1] = k;
-								}
-								z.spreadTwoHit = false;
-							}
-							k++;
-						}
-						if (minDistance2[0] != 2000) {
-							// zombies.get((int)minDistance[1]).isShot = true;
-							score++;
-							if ((zombies.get((int) minDistance2[1]).health -= currentGun.damage) < 0) {
-								zombies.remove((int) minDistance2[1]);
-								score++;
-							} else
-								zombies.get((int) minDistance2[1]).setColor();
-						}
-					}
-				}
-				
-			}
-			if (currentGun.name == "AK-47") {
-				if (currentGun.magCurrent > 0 && System.currentTimeMillis() - lastShot > currentGun.shotTime
-						&& !reloading) {
-					shooting = true;
-					currentGun.shoot(player);
-					lastShot = System.currentTimeMillis();
-					autoReady = true;
-				}
-			} else {
-				shooting = false;
-			}
-			
-		}
-		
-		if (currentGun.isAuto == true) {
-			
-			if (currentGun.magCurrent > 0 && System.currentTimeMillis() - lastShot > currentGun.shotTime
-					&& !reloading) {
-				autoReady = true;
-			}
-			
 		}
 	}
 
@@ -407,7 +273,7 @@ public class ZombiesTestRunner extends Game {
 		// TODO Auto-generated method stub
 		
 		guns.put("Pistol", new Pistol(zombies, player));
-		guns.put("AK-47", new Automatic(zombies, player));
+		guns.put("AK-47", new AK47(zombies, player));
 		guns.put("Rifle", new Rifle(zombies, player));
 		guns.put("Shotgun", new Shotgun(zombies, player));
 		guns.put("Sniper", new Sniper(zombies, player));
