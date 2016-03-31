@@ -41,7 +41,7 @@ public class ZombiesTestRunner extends Game {
 	
 	public boolean rPressed = false;
 	public boolean wPressed = false;
-	public boolean shooting = false;
+//	public boolean shooting = false;
 	public static HashMap<String, Gun> guns = new HashMap<String, Gun>();
 	public Gun currentGun;
 	
@@ -286,7 +286,6 @@ public class ZombiesTestRunner extends Game {
 		rightKey = KeyEvent.VK_D;
 		
 		movementVar = 3;
-		shooting = false;
 		Windows.setSCORE_SIZE(30);
 		currentGun.reload();
 		
@@ -305,7 +304,6 @@ public class ZombiesTestRunner extends Game {
 		if (m.getButton() == MouseEvent.BUTTON1) {
 //			if (System.currentTimeMillis() - lastShot > currentGun.shotTime && !reloading
 //					&& currentGun.magCurrent > 0) {
-				shooting = true;
 //				currentGun.shoot(player, cursorX, cursorY);
 //				lastShot = System.currentTimeMillis();
 //				autoReady = true;
@@ -318,7 +316,6 @@ public class ZombiesTestRunner extends Game {
 	public void released(MouseEvent m) {
 		
 		if (m.getButton() == MouseEvent.BUTTON1) {
-			shooting = false;
 //			currentGun.stopShooting();
 		}
 	}
