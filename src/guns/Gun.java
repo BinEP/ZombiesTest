@@ -26,7 +26,7 @@ public abstract class Gun implements ActionListener{
 	public int magSize;
 	public int reloadTime;
 	public int shotTime;
-	public SpecialTimer firingTimer;
+	public SpecialTimer firingTimer = new SpecialTimer(100, this);
 	public Shot shot = new Shot();
 	
 	public String name;
@@ -45,10 +45,11 @@ public abstract class Gun implements ActionListener{
 		this.magSize = magSize;
 		this.reloadTime = reloadTime;
 		this.shotTime = shotTime;
-		firingTimer = new SpecialTimer(shotTime, this);
-		firingTimer.fireTimerWhenStart(false);
+//		firingTimer = new SpecialTimer(shotTime, this);
+		firingTimer.setInitialDelay(shotTime);
+		firingTimer.fireTimerWhenStart(true);
 		firingTimer.setRepeats(false);
-		firingTimer.start();
+//		firingTimer.start();
 	}
 	
 	public void setPlayer(Player p) {
@@ -83,16 +84,16 @@ public abstract class Gun implements ActionListener{
 			return new ArrayList<Integer>();
 		}
 		
-		int rise = ZombiesTestRunner.getMouseY() - player.y - player.width;
-		int run = ZombiesTestRunner.getMouseX() - player.x - player.width;
+		int rise = ZombiesTestRunner.getMouseY() - (int) player.y - (int) player.width;
+		int run = ZombiesTestRunner.getMouseX() - (int) player.x - (int) player.width;
 		
 		magCurrent--;
 		while ((run + player.x > 0 && run + player.x < 800) && (rise + player.y > 0 && rise + player.y < 480)) {
 			run *= 2;
 			rise *= 2;
 		}
-		int x = player.x + run;
-		int y = player.y + rise;
+		int x = (int) player.x + run;
+		int y = (int) player.y + rise;
 		shot = new Shot(player.x + player.width, player.y + player.width, x, y);
 		
 		modifyShot();
@@ -176,12 +177,13 @@ public abstract class Gun implements ActionListener{
 //	}
 	
 	public void shootEvent(Figure player) {
+		System.out.println("Firing: " + firingTimer.isRunning());
 		if (!firingTimer.isRunning()) {
-			firingTimer.setInitialDelay(getGunDelay());
-			firingTimer.fireTimerWhenStart(true);
+			firingTimer.stop();
 			firingTimer.setActionCommand("Shoot");
+			firingTimer.setInitialDelay(getGunDelay());
 			resetShot();
-			firingTimer.restart();
+			firingTimer.start();
 		}
 	}
 	
@@ -194,14 +196,14 @@ public abstract class Gun implements ActionListener{
 		if (!firingTimer.isRunning() || firingTimer.getActionCommand().equals("Shoot")) {
 			stopShooting();
 			firingTimer.setInitialDelay(reloadTime);
-			firingTimer.fireTimerWhenStart(true);
 			firingTimer.setActionCommand("Reload");
-			firingTimer.restart();
+			firingTimer.start();
 			
 		}
 	}
 	
 	public boolean isReloading() {
+		if (firingTimer.getActionCommand() == null) return false;
 		return firingTimer.getActionCommand().equals("Reload") && firingTimer.isRunning();
 	}
 	

@@ -72,7 +72,7 @@ public class Zombie extends Figure {
 	
 	
 	@Override
-	public void move(Polygon screen, ArrayList<? extends Figure> badFigures, Figure player) {
+	public void move(Rectangle screen, ArrayList<? extends Figure> badFigures, Figure player) {
 		moveX(player);
 		moveY(player);
 		checkCollisions(badFigures, player);

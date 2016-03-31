@@ -8,7 +8,7 @@ import persons.Zombie;
 public class Rifle extends Gun {
 	
 	public Rifle(ArrayList<Zombie> zombies, Player player) {
-		super("Rifle", 105, 15, 1500, 200, 200);
+		super("Rifle", 105, 15, 1500, 500, 200);
 		setPlayer(player);
 		setZombies(zombies);
 	}

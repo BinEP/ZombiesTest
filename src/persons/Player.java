@@ -1,6 +1,7 @@
 package persons;
 
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
@@ -27,11 +28,11 @@ public class Player extends Figure {
 	}
 	
 	@Override
-	public void move(Polygon screen, ArrayList<? extends Figure> badFigures, Figure player) {
+	public void move(Rectangle screen, ArrayList<? extends Figure> badFigures, Figure player) {
 		
 		y += deltaY;
 		
-		if (screen.contains(getBounds2D())) {
+		if (!screen.contains(getBounds2D())) {
 			y -= deltaY;
 		}
 		

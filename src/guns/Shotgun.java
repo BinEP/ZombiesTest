@@ -46,10 +46,10 @@ public class Shotgun extends Gun {
 		if (magCurrent >= 0) {
 			AffineTransform af = new AffineTransform();
 			af.setToRotation(Math.PI / 20, player.x + 15, player.y + 15);
-			spreadOneShot.setLine(new Point(player.x + 15, player.y + 15), af.transform(shot.getP2(), null));
+			spreadOneShot.setLine(new Point((int) player.x + 15, (int) player.y + 15), af.transform(shot.getP2(), null));
 			
 			af.setToRotation(-Math.PI / 20, player.x + 15, player.x + 15);
-			spreadTwoShot.setLine(new Point(player.x + 15, player.y + 15), af.transform(shot.getP2(), null));
+			spreadTwoShot.setLine(new Point((int) player.x + 15, (int) player.y + 15), af.transform(shot.getP2(), null));
 		}		
 	}
 	

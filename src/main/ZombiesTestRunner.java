@@ -32,9 +32,6 @@ public class ZombiesTestRunner extends Game {
 	public Player player = new Player(playerX - 15, playerY - 15, playerWidth, playerWidth, 200);
 	public boolean touchingZombie = false;
 	
-	public int[] screenX = { 0, 800, 800, 0 };
-	public int[] screenY = { 0, 0, 480, 480 };
-	public Polygon screen = new Polygon(screenX, screenY, 4);
 	public int ticks = 75;
 	public int maxTicks = 150;
 	public int scoreCount = 0;
@@ -66,6 +63,7 @@ public class ZombiesTestRunner extends Game {
 	public void moves() {
 		// TODO Auto-generated method stub
 		
+		ticks++;
 		playerMove();
 		zombieMove();
 		
@@ -110,7 +108,7 @@ public class ZombiesTestRunner extends Game {
 			player.deltaX = 0;
 		}
 		
-		player.move(screen, zombies, player);
+		player.move(outerbox, zombies, player);
 		
 	}
 
@@ -123,7 +121,7 @@ public class ZombiesTestRunner extends Game {
 		for (Zombie z : zombies) {
 //			if (z.move(player, zombies, player.health))
 //				player.health -= 2;
-			z.move(screen, zombies, player);
+			z.move(outerbox, zombies, player);
 		}
 	}
 
@@ -158,7 +156,7 @@ public class ZombiesTestRunner extends Game {
 		
 		if (ticks >= maxTicks) {
 			ticks = 0;
-			
+			System.out.println("Spawn Zombie");
 			randomSpeed = (3 + (int) (Math.random() * 3)) * 0.25;
 			int zombieY = ((int) (Math.random() * 2) == 1) ? -20 : 500;
 			
@@ -224,7 +222,7 @@ public class ZombiesTestRunner extends Game {
 	public void drawPlayer(Graphics2D g) {
 		
 		g.setColor(Color.RED);
-		g.fillOval(player.x, player.y, playerWidth, playerWidth);
+		g.fillOval((int) player.x, (int) player.y, (int) player.width, (int) player.width);
 	}
 
 	public void supplyDropDraw(Graphics2D g) {
@@ -258,8 +256,8 @@ public class ZombiesTestRunner extends Game {
 	public void drawAimDot(Graphics2D g) {
 		
 		g.setColor(Color.CYAN);
-		int centerX = player.x + 15;
-		int centerY = player.y + 15;
+		int centerX = (int) player.x + 15;
+		int centerY = (int) player.y + 15;
 		int sideX = getMouseX() - centerX;
 		int sideY = getMouseY() - centerY;
 		double distance = Math.sqrt(sideX * sideX + sideY * sideY);
@@ -278,9 +276,11 @@ public class ZombiesTestRunner extends Game {
 		guns.put("Shotgun", new Shotgun(zombies, player));
 		guns.put("Sniper", new Sniper(zombies, player));
 
-		currentGun = guns.get("Pistol");
-		
-		upKey = KeyEvent.VK_R;
+		currentGun = guns.get("Rifle");
+		System.out.println(currentGun.shotTime);
+		System.out.println(currentGun.firingTimer.getInitialDelay());
+
+		upKey = KeyEvent.VK_W;
 		downKey = KeyEvent.VK_S;
 		leftKey = KeyEvent.VK_A;
 		rightKey = KeyEvent.VK_D;
@@ -319,7 +319,7 @@ public class ZombiesTestRunner extends Game {
 		
 		if (m.getButton() == MouseEvent.BUTTON1) {
 			shooting = false;
-			currentGun.stopShooting();
+//			currentGun.stopShooting();
 		}
 	}
 	
@@ -342,7 +342,6 @@ public class ZombiesTestRunner extends Game {
 	
 	public static void main(String[] args) {
 		
-		// TODO Auto-generated method stub
 		new Runner(new ZombiesTestRunner());
 	}
 }
