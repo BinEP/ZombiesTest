@@ -1,20 +1,20 @@
+package main;
+import java.awt.Point;
 import java.awt.Rectangle;
 
 
-public class Bullet {
+public class Bullet extends Rectangle {
 	
 	public int startX;
 	public int startY;
-	public int x;
-	public int y;
-	public int width;
-	public int height = 1;
 	public int spread;
 	
-	public Bullet(Rectangle start, int width, int spread){
+	public Bullet(Point start, int width, int spread){
+		super(start);
 		this.startX = start.x;
 		this.startY = start.y;
 		this.spread = spread;
+		this.height = 1;
 		this.width = width;	
 	}
 }
