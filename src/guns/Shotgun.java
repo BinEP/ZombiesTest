@@ -53,5 +53,23 @@ public class Shotgun extends Gun {
 		}		
 	}
 	
+	@Override
+	public ArrayList<Zombie> loopThroughZombies() {
+			
+		ArrayList<Zombie> shotZombies = new ArrayList<Zombie>();
+		for (Zombie z : zombies) {
+			if (applyShot(z)) {
+				if (shot.isShot())
+					shotZombies.add(z);
+				if (spreadOneShot.isShot())
+					shotZombies.add(z);
+				if (spreadTwoShot.isShot())
+					shotZombies.add(z);
+				if (shot.isShot() && spreadOneShot.isShot() && spreadTwoShot.isShot())
+					return shotZombies;
+			}
+		}
+		return shotZombies;
+	}
 	
 }

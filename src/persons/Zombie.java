@@ -16,6 +16,9 @@ public class Zombie extends Figure {
 	
 	
 	public boolean isUndead = false;
+	public boolean playerLoseHealth;
+	
+	public double distance;
 	
 	public final Color FOREST = new Color(34, 139, 34);
 	public final Color OLIVE = new Color(107, 142, 35);
@@ -73,13 +76,19 @@ public class Zombie extends Figure {
 	
 	@Override
 	public void move(Rectangle screen, ArrayList<? extends Figure> badFigures, Figure player) {
-		moveX(player);
-		moveY(player);
-		checkCollisions(badFigures, player);
+		playerLoseHealth = false;
+		moveX(player, badFigures);
+		
+		moveY(player, badFigures);
+	
+		if(playerLoseHealth){
+			player.health -= 2;
+		}
+		//checkCollisions(badFigures, player);
 		// TODO Auto-generated method stub
 	}
 	
-	public void moveX(Figure player) {
+	public void moveX(Figure player, ArrayList<? extends Figure> badFigures) {
 		
 		deltaX = 0;
 		if (player.x >= x) {
@@ -89,10 +98,21 @@ public class Zombie extends Figure {
 		}
 		
 		x += deltaX;
+		if(touchingFigure(player)){
+			playerLoseHealth = true;
+		}
+		for (Figure z : badFigures){
+			if(touchingFigure(z)){
+				x -= deltaX;
+			}
+		}
+		
+		
+		
 		
 	}
 	
-	public void moveY(Figure player) {
+	public void moveY(Figure player, ArrayList<? extends Figure> badFigures) {
 		
 		deltaY = 0;
 		
@@ -103,18 +123,25 @@ public class Zombie extends Figure {
 		}
 		
 		y += deltaY;
+		if(touchingFigure(player)){
+			playerLoseHealth = true;
+		}
+		for (Figure z : badFigures){
+			if(touchingFigure(z)){
+				y -= deltaY;
+			}
+		}
 		
 	}
 	
-	public boolean checkCollisions(ArrayList<? extends Figure> badFigures, Figure player) {
-		super.checkCollisions(badFigures);
-		
-		if (touchingFigure(player)) {
-			x -= deltaX;
-			y -= deltaY;
-		}
-		return false;
-	}
+//	public boolean checkCollisions(ArrayList<? extends Figure> badFigures, Figure player) {
+//		super.checkCollisions(badFigures);
+//		
+////		if (touchingFigure(player)) {
+////			return true;
+////		}
+////		else return false;
+//	}
 	
 	public boolean isDead() {
 		return health <= 0;
@@ -125,4 +152,87 @@ public class Zombie extends Figure {
 		health -= damage;
 		this.setColor();
 	}
+	
+	public boolean moveX(Rectangle player, ArrayList<Zombie> zombies, int playerHealth){
+			
+			boolean loseHealth = false;
+		deltaX = 0;
+		if (player.x >= x){
+			deltaX = movementVar;
+		} else if (player.x <= x){
+			deltaX = -movementVar;
+		}
+		
+		x += deltaX;
+		for (Zombie z : zombies){
+				if (touchingZombie(z)){
+					x -= deltaX;
+				}
+				if(touchingPlayer(player)){
+					x -= deltaX;
+					loseHealth = true;
+				}
+		}
+		return loseHealth;
+	}
+
+	public boolean moveY(Rectangle player, ArrayList<Zombie> zombies, int playerHealth){
+	
+		boolean loseHealth = false;
+		
+		deltaY = 0;
+		
+		if (player.y >= y){
+			deltaY = movementVar;
+		} else if (player.y <= y){
+			deltaY = -movementVar;
+		}
+		
+		y += deltaY;
+		for (Zombie z : zombies){
+				if (touchingZombie(z)){
+					y -= deltaY;
+				}
+				if (touchingPlayer(player)){
+					y -= deltaY;
+					loseHealth = true;
+				}
+			}
+		return loseHealth;
+	}
+	
+	public boolean touchingPlayer(Rectangle player){
+		
+		if (player.y != y || player.x != x){ // If not the same zombie
+			double sideA = (int) (player.x - x);
+			double sideB = (int) (player.y - y);
+			distance = Math.sqrt(sideA * sideA + sideB * sideB);
+			
+			if (distance <= width){
+				return true;
+			} else{
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	
+public boolean touchingZombie(Zombie zombie){
+		
+		if (zombie.y != y || zombie.x != x){ // If not the same zombie
+			double sideA = (int) (zombie.x - x);
+			double sideB = (int) (zombie.y - y);
+			distance = Math.sqrt(sideA * sideA + sideB * sideB);
+			
+			if (distance <= width){
+				return true;
+			} else{
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	
 }
