@@ -37,9 +37,7 @@ public class Sprite {
 	public ArrayList<Point> offsets = new ArrayList<Point>();
 	
 	int iterator = 0;
-//	public BufferedImage sprite;
-//	private Polygon edges;
-	private boolean polygon;
+
 	ArrayList<Point> orderedList = new ArrayList<Point>();
 	
 	public Sprite(int startFrame, String... fileLocations) {
@@ -344,17 +342,6 @@ public class Sprite {
 		return nums;
 	}
 	
-	private String printArray(int[] arr) {
-		String arrS = "[ ";
-		for (int i : arr) {
-			arrS += i + ", ";
-			
-		}
-		arrS = arrS.substring(0, arrS.length() - 2);
-		arrS += "]";
-		return arrS;
-	}
-	
 	public void drawSprite(Graphics2D g) {
 		g.setColor(Color.WHITE);
 //		for (int i = 0; i < sprites.size(); i++) {
@@ -394,9 +381,14 @@ public class Sprite {
 			visibleSprite++;
 			if (visibleSprite >= sprites.size()) visibleSprite = 0;
 		}
-//		System.out.println("Translate x: " + (edges.get(visibleSprite).getBounds().x - x));
-//		System.out.println("Translate y: " + (edges.get(visibleSprite).getBounds().y - y));
+		
+		spriteTransforms();
+		
 
+	}
+
+	public void spriteTransforms() {
+		
 		Image image;
 		if (width >= height) {
 			image = sprites.get(visibleSprite).getScaledInstance(width, -1, Image.SCALE_DEFAULT);
@@ -416,7 +408,5 @@ public class Sprite {
 	
 		transform.setToTranslation(polygonX, polygonY);
 		edges.set(visibleSprite, transform.createTransformedShape(edges.get(visibleSprite)));
-		
-
 	}
 }
