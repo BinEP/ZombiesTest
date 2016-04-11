@@ -32,7 +32,7 @@ public class SupplyDrop extends Rectangle implements ActionListener {
 	
 	
 	public void spawnSupplyDrop(Player player) {
-//		displaySupplyDrop = true;
+		displaySupplyDrop = true;
 				
 		do {
 			x = (int) (Math.random() * 760) + 20;
