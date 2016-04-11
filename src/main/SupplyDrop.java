@@ -15,6 +15,8 @@ import persons.Player;
 
 public class SupplyDrop extends Rectangle implements ActionListener {
 	
+	private static final long serialVersionUID = 1L;
+
 	public boolean displaySupplyDrop = false;
 
 	public int insideDrop;

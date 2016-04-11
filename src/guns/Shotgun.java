@@ -1,12 +1,9 @@
 package guns;
 
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
-import persons.Figure;
 import persons.Player;
 import persons.Zombie;
 

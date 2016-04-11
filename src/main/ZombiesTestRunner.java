@@ -1,22 +1,15 @@
 package main;
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
-import javafx.scene.shape.Line;
 import persons.Player;
 import persons.Zombie;
 import utility_classes.Windows;
@@ -25,6 +18,8 @@ import game_actions.Runner;
 import guns.*;
 
 public class ZombiesTestRunner extends Game {
+	
+	private static final long serialVersionUID = 1L;
 	
 	public int playerX = 400;
 	public int playerY = 220;
@@ -314,6 +309,7 @@ public class ZombiesTestRunner extends Game {
 		guns.put("Rifle", new Rifle(zombies, player));
 		guns.put("Shotgun", new Shotgun(zombies, player));
 		guns.put("Sniper", new Sniper(zombies, player));
+		guns.put("Browning", new Browning(zombies, player));
 
 		switchCurrentGun("Sniper");
 		switchCurrentGun("Pistol");

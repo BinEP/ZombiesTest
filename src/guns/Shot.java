@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 
 public class Shot extends Line2D.Double {
 	
+	private static final long serialVersionUID = 1L;
 	private boolean shotHit = false;
 	
 	public Shot() {

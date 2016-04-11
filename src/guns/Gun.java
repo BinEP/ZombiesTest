@@ -1,17 +1,9 @@
 package guns;
 
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
-import java.awt.geom.Line2D.Double;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-import javafx.scene.shape.Line;
 import main.SpecialTimer;
 import main.ZombiesTestRunner;
 import persons.Figure;
