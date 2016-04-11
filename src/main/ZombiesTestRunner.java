@@ -132,7 +132,7 @@ public class ZombiesTestRunner extends Game {
 	}
 
 	public void playerMove() {
-		//TODO Something is seriouosly messed up with movement, not sure what though.
+		//TODO Something is seriously messed up with movement, not sure what though.
 		//But I don't like how it looks - seems like zombie and player movements are mixed
 		//right now
 		
@@ -297,7 +297,7 @@ public class ZombiesTestRunner extends Game {
 		double distance = Math.sqrt(sideX * sideX + sideY * sideY);
 		int a = centerX + (int) ((sideX * Math.sqrt(900)) / distance);
 		int b = centerY + (int) ((sideY * Math.sqrt(900)) / distance);
-		g.fillOval(a, b, 4, 4);
+		g.fillOval(a - 2, b - 2, 4, 4);
 	}
 	
 	@Override
