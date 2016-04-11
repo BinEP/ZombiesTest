@@ -54,7 +54,7 @@ public class ZombiesTestRunner extends Game {
 	public SupplyDrop supplyDrop = new SupplyDrop();
 	
 	public static int getMouseX() {
-		return MouseInfo.getPointerInfo().getLocation().x ;
+		return MouseInfo.getPointerInfo().getLocation().x + 3;
 	}
 	
 	public static int getMouseY() {
@@ -310,11 +310,10 @@ public class ZombiesTestRunner extends Game {
 		guns.put("Shotgun", new Shotgun(zombies, player));
 		guns.put("Sniper", new Sniper(zombies, player));
 		guns.put("Browning", new Browning(zombies, player));
-
+		
 		switchCurrentGun("Sniper");
 		switchCurrentGun("Pistol");
-		switchCurrentGun("Shotgun");
-
+		
 		System.out.println(currentGun.shotTime);
 		System.out.println(currentGun.firingTimer.getInitialDelay());
 
