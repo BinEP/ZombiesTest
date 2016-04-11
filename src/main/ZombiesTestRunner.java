@@ -49,7 +49,7 @@ public class ZombiesTestRunner extends Game {
 	
 	public double randomSpeed;
 	public ArrayList<Zombie> zombies = new ArrayList<Zombie>();
-	public int zombieLives = 100;
+	public int zombieLives = 200;
 		
 	public SupplyDrop supplyDrop = new SupplyDrop();
 	
