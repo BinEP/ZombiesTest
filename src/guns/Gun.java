@@ -1,17 +1,9 @@
 package guns;
 
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
-import java.awt.geom.Line2D.Double;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-import javafx.scene.shape.Line;
 import main.SpecialTimer;
 import main.ZombiesTestRunner;
 import persons.Figure;
@@ -77,12 +69,9 @@ public abstract class Gun implements ActionListener{
 		}
 	}
 	
-	public ArrayList<Integer> shoot(Figure player) {
+	public ArrayList<Zombie> shoot(Figure player) {
 		
-		if (magCurrent <= 0) {
-			reloadEvent();
-			return new ArrayList<Integer>();
-		}
+		
 		
 		int rise = ZombiesTestRunner.getMouseY() - (int) player.y - (int) player.width;
 		int run = ZombiesTestRunner.getMouseX() - (int) player.x - (int) player.width;
@@ -98,17 +87,23 @@ public abstract class Gun implements ActionListener{
 		
 		modifyShot();
 		
-		ArrayList<Integer> shotZombies = loopThroughZombies();
+		ArrayList<Zombie> shotZombies = loopThroughZombies();
 		
 		updateZombieHealth(shotZombies);
+		
+		if (magCurrent <= 0) {
+			reloadEvent();
+//			return new ArrayList<Integer>();
+		}
+		
 		return shotZombies;
 	}
 
-	public void updateZombieHealth(ArrayList<Integer> shotZombies) {
-		for (int i : shotZombies) {
-			Zombie z = zombies.get(i);
+	public void updateZombieHealth(ArrayList<Zombie> shotZombies) {
+		
+		for (Zombie z : shotZombies) {
 			if (z.health <= 0) {
-				zombies.remove(i);
+				zombies.remove(z);
 				score++;
 			} else {
 				z.setColor();
@@ -117,12 +112,12 @@ public abstract class Gun implements ActionListener{
 		
 	}
 
-	public ArrayList<Integer> loopThroughZombies() {
+	public ArrayList<Zombie> loopThroughZombies() {
 		
-		ArrayList<Integer> shotZombies = new ArrayList<Integer>();
-		for (int i = 0; i < zombies.size(); i++) {
-			if (applyShot(zombies.get(i))) {
-				shotZombies.add(i);
+		ArrayList<Zombie> shotZombies = new ArrayList<Zombie>();
+		for (Zombie z : zombies) {
+			if (applyShot(z)) {
+				shotZombies.add(z);
 				return shotZombies;
 			}
 		}

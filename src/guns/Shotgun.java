@@ -1,12 +1,9 @@
 package guns;
 
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
-import persons.Figure;
 import persons.Player;
 import persons.Zombie;
 
@@ -53,5 +50,23 @@ public class Shotgun extends Gun {
 		}		
 	}
 	
+	@Override
+	public ArrayList<Zombie> loopThroughZombies() {
+			
+		ArrayList<Zombie> shotZombies = new ArrayList<Zombie>();
+		for (Zombie z : zombies) {
+			if (applyShot(z)) {
+				if (shot.isShot())
+					shotZombies.add(z);
+				if (spreadOneShot.isShot())
+					shotZombies.add(z);
+				if (spreadTwoShot.isShot())
+					shotZombies.add(z);
+				if (shot.isShot() && spreadOneShot.isShot() && spreadTwoShot.isShot())
+					return shotZombies;
+			}
+		}
+		return shotZombies;
+	}
 	
 }

@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 
 public class Bullet extends Rectangle {
 	
+	private static final long serialVersionUID = 1L;
 	public int startX;
 	public int startY;
 	public int spread;

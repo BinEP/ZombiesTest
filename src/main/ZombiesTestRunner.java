@@ -1,22 +1,15 @@
 package main;
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
-import javafx.scene.shape.Line;
 import persons.Player;
 import persons.Zombie;
 import utility_classes.Windows;
@@ -26,24 +19,33 @@ import guns.*;
 
 public class ZombiesTestRunner extends Game {
 	
+	private static final long serialVersionUID = 1L;
+	
 	public int playerX = 400;
 	public int playerY = 220;
 	public int playerWidth = 30;
 	public Player player = new Player(playerX - 15, playerY - 15, playerWidth, playerWidth, 200);
 	public boolean touchingZombie = false;
 	
-	public int ticks = 75;
-	public int maxTicks = 150;
-	public int scoreCount = 0;
-	public int spawnCount = 0;
-	public int roundCount = 1;
-	public int points = 0;
+//	public int ticks = 75;
+//	public int maxTicks = 150;
+//	public int scoreCount = 0;
+//	public int spawnCount = 0;
+//	public int roundCount = 1;
+//	public int points = 0;
 	
 	public boolean rPressed = false;
 	public boolean wPressed = false;
 //	public boolean shooting = false;
 	public static HashMap<String, Gun> guns = new HashMap<String, Gun>();
+	public static HashMap<String, Gun> ownedGuns = new HashMap<String, Gun>();
 	public Gun currentGun;
+	
+	
+	public int[] screenX = {0, 800, 800, 0};
+	public int[] screenY = {0, 0, 480, 480};
+	public Polygon screen = new Polygon(screenX, screenY, 4);
+	
 	
 	public double randomSpeed;
 	public ArrayList<Zombie> zombies = new ArrayList<Zombie>();
@@ -52,26 +54,70 @@ public class ZombiesTestRunner extends Game {
 	public SupplyDrop supplyDrop = new SupplyDrop();
 	
 	public static int getMouseX() {
-		return MouseInfo.getPointerInfo().getLocation().x - 8;
+		return MouseInfo.getPointerInfo().getLocation().x ;
 	}
 	
 	public static int getMouseY() {
-		return MouseInfo.getPointerInfo().getLocation().y - 31;
+		return MouseInfo.getPointerInfo().getLocation().y - 20;
 	}
 	
 	@Override
 	public void moves() {
 		// TODO Auto-generated method stub
 		
-		ticks++;
-		playerMove();
-		zombieMove();
+		if (upPressed){
+			deltaY = -movementVar;
+		} else if (downPressed){
+			deltaY = movementVar;
+		} else{
+			deltaY = 0;
+		}
+		
+		player.y += deltaY;
+		
+		if (!screen.contains(player.getBounds())){
+			player.y -= deltaY;
+		}
+		for(Zombie z : zombies){
+			if(z.touchingPlayer(player.getBounds())){
+				 player.y -= deltaY;
+		}
+	}
+		if (rightPressed){
+			deltaX = movementVar;
+		} else if (leftPressed){
+			deltaX = -movementVar;
+		} else {
+			deltaX = 0;
+		}
+		
+		player.x += deltaX;
+		
+		if (!screen.contains(player.getBounds())){
+			player.x -= deltaX;
+		}
+		for(Zombie z : zombies){
+			if(z.touchingPlayer(player.getBounds())){
+				 player.x -= deltaX;
+		}
+	}
+		
+		for (Zombie z : zombies) {
+			if(z.moveX(player.getBounds(), zombies, player.health))
+				player.health -= 2;
+		}
+		for(Zombie z : zombies){
+			if(z.moveY(player.getBounds(), zombies, player.health))
+				player.health -= 2;
+		}
+		//playerMove();
+		//zombieMove();
 		
 		
 //		reloading();
 		
 		Collections.sort(zombies, (z1, z2) -> (int) z1.getDistanceToPlayer(player.getBounds()) - (int) z2.getDistanceToPlayer(player.getBounds()));
-		score += currentGun.score;
+		Scoring.gunUpdateScore(currentGun);
 		currentGun.score = 0;
 		
 		
@@ -80,7 +126,7 @@ public class ZombiesTestRunner extends Game {
 
 		spawnZombie();
 		
-		scoringStuff();
+		Scoring.scoreUpdate(player, supplyDrop);
 		
 		
 	}
@@ -127,48 +173,29 @@ public class ZombiesTestRunner extends Game {
 
 	public void supplyDrop() {
 		
-		if (supplyDrop.intersects(player.getBounds2D())) {
-			score = 0;
-			supplyDrop.applyDrop(currentGun);
-		}
-	}
-
-	public void scoringStuff() {
-		
-		scoreCount++;
-		if (scoreCount % 25 == 0) {
-			player.boostHealth();
-		}
-		
-		if (scoreCount == 150) {
-			scoreCount = 0;
-			score++;
-			points++;
-		}
-		if (score >= 100) {
-			score = 0;
-			roundCount += 1;
-			supplyDrop.spawnSupplyDrop(player);
+		if (supplyDrop.displaySupplyDrop && supplyDrop.intersects(player.getBounds2D())) {
+			Scoring.scoreToZero();
+			switchCurrentGun(supplyDrop.applyDrop(currentGun).name);
+			
+			System.out.println(currentGun.name);
 		}
 	}
 
 	public void spawnZombie() {
 		
-		if (ticks >= maxTicks) {
-			ticks = 0;
+		if (Scoring.readyToSpawnZombie()) {
 			System.out.println("Spawn Zombie");
 			randomSpeed = (3 + (int) (Math.random() * 3)) * 0.25;
 			int zombieY = ((int) (Math.random() * 2) == 1) ? -20 : 500;
 			
 			zombies.add(new Zombie((int) (Math.random() * 700) + 20, zombieY, 20, randomSpeed, zombieLives));
-			spawnCount++;
-			if (maxTicks > 50 && spawnCount % 2 == 0) {
-				maxTicks--;
-			}
-			if (spawnCount == 100 || spawnCount == 50)
-				zombieLives += 100;
-			
+			zombieLives = Scoring.spawnCountAdjustments(zombieLives);
 		}
+	}
+	
+	public void switchCurrentGun(String name) {
+		currentGun = guns.get(name);
+		ownedGuns.put(name, currentGun);
 	}
 	
 	@Override
@@ -208,6 +235,14 @@ public class ZombiesTestRunner extends Game {
 		
 		drawAimDot(g);
 		
+//		if(currentGun.firstShot){
+//			g.setColor(Color.ORANGE);
+//			g.fill(currentGun.shot);
+//		}
+		
+		g.setColor(Color.ORANGE);
+		g.drawLine((int)(player.x + player.width/2), (int)(player.y + player.width/2), getMouseX(), getMouseY());
+		
 		
 	}
 
@@ -239,8 +274,7 @@ public class ZombiesTestRunner extends Game {
 		
 		g.setFont(new Font("Century Gothic", Font.PLAIN, 28));
 		g.drawString(String.valueOf(currentGun.bullets), 760, 460);
-		g.drawString("Score: " + String.valueOf(points), 20, 460);
-		
+		Scoring.draw(g);		
 		g.setFont(new Font("Century Gothic", Font.PLAIN, 12));
 		g.drawString(currentGun.name, 720, 475);
 	}
@@ -275,8 +309,12 @@ public class ZombiesTestRunner extends Game {
 		guns.put("Rifle", new Rifle(zombies, player));
 		guns.put("Shotgun", new Shotgun(zombies, player));
 		guns.put("Sniper", new Sniper(zombies, player));
+		guns.put("Browning", new Browning(zombies, player));
 
-		currentGun = guns.get("Rifle");
+		switchCurrentGun("Sniper");
+		switchCurrentGun("Pistol");
+		switchCurrentGun("Shotgun");
+
 		System.out.println(currentGun.shotTime);
 		System.out.println(currentGun.firingTimer.getInitialDelay());
 
@@ -326,6 +364,16 @@ public class ZombiesTestRunner extends Game {
 		if (e.getKeyCode() == KeyEvent.VK_R) {
 			rPressed = true;
 			currentGun.reloadEvent();
+		} else if (e.getKeyCode() == KeyEvent.VK_T) {
+//			rPressed = true;
+			ArrayList<Gun> prevOwnGuns = new ArrayList<Gun>();
+			prevOwnGuns.addAll(ownedGuns.values());
+			int currentIndex = prevOwnGuns.indexOf(currentGun);
+			currentIndex++;
+			if (currentIndex >= prevOwnGuns.size()) currentIndex = 0;
+			currentGun = prevOwnGuns.get(currentIndex);
+			if (currentGun.magCurrent <= 0)
+				currentGun.reloadEvent();
 		}
 	}
 	

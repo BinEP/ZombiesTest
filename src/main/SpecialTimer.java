@@ -7,6 +7,7 @@ import javax.swing.Timer;
 
 public class SpecialTimer extends Timer {
 
+	private static final long serialVersionUID = 1L;
 	private boolean fireAtStart = true;
 	private boolean initialFire = false;
 	
