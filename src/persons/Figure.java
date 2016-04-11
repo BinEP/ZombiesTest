@@ -1,14 +1,13 @@
 package persons;
 
 import java.awt.Color;
-import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 public abstract class Figure extends Ellipse2D.Double {
-	
+
+	private static final long serialVersionUID = 1L;
 	public double speed;
 	public double deltaX;
 	public double deltaY;

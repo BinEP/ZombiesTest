@@ -1,12 +1,11 @@
 package persons;
 
-import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
 public class Player extends Figure {
 
+	private static final long serialVersionUID = 1L;
 	public int maxHealth;
 	public int loseHealthByZombie = 2;
 	private boolean collision = false;
