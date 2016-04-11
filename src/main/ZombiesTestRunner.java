@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import persons.Player;
+import persons.Sprite;
 import persons.Zombie;
 import utility_classes.Windows;
 import game_actions.Game;
@@ -25,6 +26,10 @@ public class ZombiesTestRunner extends Game {
 	public int playerY = 220;
 	public int playerWidth = 30;
 	public Player player = new Player(playerX - 15, playerY - 15, playerWidth, playerWidth, 200);
+	
+	Sprite playerSprite = new Sprite(1, "InfoFiles/player1.png", "InfoFiles/player2.png", "InfoFiles/player3.png", "InfoFiles/player2.png");
+	
+	
 	public boolean touchingZombie = false;
 	
 //	public int ticks = 75;
@@ -120,7 +125,10 @@ public class ZombiesTestRunner extends Game {
 		Scoring.gunUpdateScore(currentGun);
 		currentGun.score = 0;
 		
-		
+		playerSprite.setLocation((int) player.x, (int) player.y, (int) player.width, (int) player.height);
+		playerSprite.setAngle(aimDotAngle());
+		playerSprite.updateSprite();
+
 		
 		supplyDrop();
 
@@ -198,6 +206,20 @@ public class ZombiesTestRunner extends Game {
 		ownedGuns.put(name, currentGun);
 	}
 	
+	public double aimDotAngle() {
+		int centerX = (int) player.x + 15;
+		int centerY = (int) player.y + 15;
+		int sideX = getMouseX() - centerX;
+		int sideY = getMouseY() - centerY;
+		double distance = Math.sqrt(sideX * sideX + sideY * sideY);
+		int a = (int) ((sideX * Math.sqrt(900)) / distance);
+		int b = (int) ((sideY * Math.sqrt(900)) / distance);
+		System.out.println("x: " + a);
+		System.out.println("y: " + b);
+
+		return Math.atan2(b, a);
+	}
+	
 	@Override
 	public boolean checkIfDead() {
 		// TODO Auto-generated method stub
@@ -257,7 +279,9 @@ public class ZombiesTestRunner extends Game {
 	public void drawPlayer(Graphics2D g) {
 		
 		g.setColor(Color.RED);
-		g.fillOval((int) player.x, (int) player.y, (int) player.width, (int) player.width);
+//		g.fillOval((int) player.x, (int) player.y, (int) player.width, (int) player.width);
+		playerSprite.drawSprite(g);
+
 	}
 
 	public void supplyDropDraw(Graphics2D g) {
@@ -323,6 +347,11 @@ public class ZombiesTestRunner extends Game {
 		leftKey = KeyEvent.VK_A;
 		rightKey = KeyEvent.VK_D;
 		
+		playerSprite.setTiming(10, 10, 10, 10);
+		playerSprite.setLocation((int) player.x, (int) player.y, (int) player.width, (int) player.height);
+		playerSprite.setPolygonOffset(0, 0, 10);
+		playerSprite.setPolygonOffset(2, 0, -10);
+
 		movementVar = 3;
 		Windows.setSCORE_SIZE(30);
 		currentGun.reload();
