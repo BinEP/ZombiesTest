@@ -186,7 +186,7 @@ public class Sprite {
 	            nearestIndex=i;
 	        }
 	    }
-	    System.out.println("Dist: " + nearestDistSquared);
+//	    System.out.println("Dist: " + nearestDistSquared);
 	    return new Point(nearestIndex, (nearestDistSquared < 20) ? 1 : -1);
 	}
 	
@@ -366,7 +366,6 @@ public class Sprite {
 		AffineTransform transform = new AffineTransform();
 		transform.setToRotation(currentAngle, image.getWidth(null) / 2 + x, image.getHeight(null) / 2 + y);
 
-		System.out.println("Current Angle: " + currentAngle);
 		Shape transShape = transform.createTransformedShape(edges.get(visibleSprite));
 		transform.translate(x + (int) Math.ceil(offsets.get(visibleSprite).x * scale), y + (int) Math.ceil(offsets.get(visibleSprite).y * scale));
 		g.drawImage(image, transform, null);

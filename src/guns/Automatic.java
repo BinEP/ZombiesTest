@@ -1,5 +1,6 @@
 package guns;
 
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import persons.Player;
@@ -17,6 +18,7 @@ public abstract class Automatic extends Gun {
 	public int getGunDelay() {
 		
 		this.firingTimer.setRepeats(true);
+		this.firingTimer.setDelay(shotTime);
 		// TODO Auto-generated method stub
 		return super.getGunDelay();
 	}
@@ -27,4 +29,14 @@ public abstract class Automatic extends Gun {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public void reload() {
+		firingTimer.setRepeats(false);
+		// TODO Auto-generated method stub
+		super.reload();
+	}
+	
+	@Override
+	public abstract void onMouseRelease(MouseEvent m);
 }

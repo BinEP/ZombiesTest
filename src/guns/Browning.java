@@ -1,5 +1,6 @@
 package guns;
 
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import persons.Player;
@@ -11,6 +12,12 @@ public class Browning extends Automatic {
 		super(zombies, player, "Browning", 300, 100, 4000, 300, 150);
 		setPlayer(player);
 		setZombies(zombies);
+	}
+
+	@Override
+	public void onMouseRelease(MouseEvent m) {
+		
+		stopShooting();
 	}
 	
 }

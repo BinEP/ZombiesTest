@@ -2,6 +2,8 @@ package persons;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 
@@ -13,6 +15,7 @@ public abstract class Figure extends Ellipse2D.Double {
 	public double deltaY;
 	public double movementVar;
 	public boolean ifLoseHealth = true;
+	public boolean onScreen = true;
 	
 	public int health;
 	public Color color;
@@ -51,5 +54,13 @@ public abstract class Figure extends Ellipse2D.Double {
 			return distance <= width;
 		}
 		return false;
+	}
+	
+	public void translateWithTransform(AffineTransform transform) {
+		Shape s = transform.createTransformedShape(this);
+		this.x = s.getBounds().x;
+		this.y = s.getBounds().y;
+		this.width = s.getBounds().width;
+		this.height = s.getBounds().height;
 	}
 }

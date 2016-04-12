@@ -2,6 +2,7 @@ package guns;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import main.SpecialTimer;
@@ -70,8 +71,6 @@ public abstract class Gun implements ActionListener{
 	}
 	
 	public ArrayList<Zombie> shoot(Figure player) {
-		
-		
 		
 		int rise = ZombiesTestRunner.getMouseY() - (int) player.y - (int) player.width;
 		int run = ZombiesTestRunner.getMouseX() - (int) player.x - (int) player.width;
@@ -217,6 +216,10 @@ public abstract class Gun implements ActionListener{
 	}
 	
 	public void applyDrop() {
+		
+	}
+	
+	public void onMouseRelease(MouseEvent m) {
 		
 	}
 	

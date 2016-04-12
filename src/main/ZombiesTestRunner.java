@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -47,10 +48,10 @@ public class ZombiesTestRunner extends Game {
 	public Gun currentGun;
 	
 	
-	public int[] screenX = {0, 800, 800, 0};
-	public int[] screenY = {0, 0, 480, 480};
-	public Polygon screen = new Polygon(screenX, screenY, 4);
-	
+//	public int[] screenX = {0, 800, 800, 0};
+//	public int[] screenY = {0, 0, 480, 480};
+//	public Polygon screen = new Polygon(screenX, screenY, 4);
+	public Rectangle visibleScreen = new Rectangle(0, 0, 800, 480);
 	
 	public double randomSpeed;
 	public ArrayList<Zombie> zombies = new ArrayList<Zombie>();
@@ -80,7 +81,7 @@ public class ZombiesTestRunner extends Game {
 		
 		player.y += deltaY;
 		
-		if (!screen.contains(player.getBounds())){
+		if (!visibleScreen.contains(player.getBounds())){
 			player.y -= deltaY;
 		}
 		for(Zombie z : zombies){
@@ -98,7 +99,7 @@ public class ZombiesTestRunner extends Game {
 		
 		player.x += deltaX;
 		
-		if (!screen.contains(player.getBounds())){
+		if (!visibleScreen.contains(player.getBounds())){
 			player.x -= deltaX;
 		}
 		for(Zombie z : zombies){
@@ -214,9 +215,7 @@ public class ZombiesTestRunner extends Game {
 		double distance = Math.sqrt(sideX * sideX + sideY * sideY);
 		int a = (int) ((sideX * Math.sqrt(900)) / distance);
 		int b = (int) ((sideY * Math.sqrt(900)) / distance);
-		System.out.println("x: " + a);
-		System.out.println("y: " + b);
-
+		
 		return Math.atan2(b, a);
 	}
 	
@@ -338,6 +337,7 @@ public class ZombiesTestRunner extends Game {
 		switchCurrentGun("Sniper");
 		switchCurrentGun("Pistol");
 		switchCurrentGun("Shotgun");
+		switchCurrentGun("AK-47");
 
 		System.out.println(currentGun.shotTime);
 		System.out.println(currentGun.firingTimer.getInitialDelay());
@@ -384,6 +384,7 @@ public class ZombiesTestRunner extends Game {
 		
 		if (m.getButton() == MouseEvent.BUTTON1) {
 //			currentGun.stopShooting();
+			currentGun.onMouseRelease(m);
 		}
 	}
 	
